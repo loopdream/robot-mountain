@@ -1,0 +1,5 @@
+domain: localhost:3000
+title: Hello World
+description: Hello hello
+image: /assets/images/seneca.jpg
+

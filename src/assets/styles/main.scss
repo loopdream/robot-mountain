@@ -1,3 +1,7 @@
+@import "bourbon";
+@import "neat";
+@import '../../../node_modules/sass-mq/_mq';
 @import 'variables';
-@import 'components/base.scss';
+
+@import 'components/base';
 

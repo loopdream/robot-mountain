@@ -1,7 +1,18 @@
 extends ../layouts/default
 
 block content
-	
-  h1 Hello World
 
-  img(src=image)
+  main.background-image  
+    div.content
+      h1
+        a(href="http://robotmountain.co.uk")=homepage.heading
+      .next-gig
+        if nextGig
+          span.venue=nextGig.venue 
+          span.date=nextGig.date
+          span.time=nextGig.time
+        else
+          span Blah
+
+
+

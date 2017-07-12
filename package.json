@@ -17,6 +17,7 @@
     "gulp-concat": "^2.6.1",
     "gulp-csscomb": "^3.0.8",
     "gulp-csslint": "^1.0.0",
+    "gulp-if": "^2.0.2",
     "gulp-imagemin": "^3.3.0",
     "gulp-jshint": "^2.0.4",
     "gulp-merge-media-queries": "^0.2.1",
@@ -29,10 +30,12 @@
     "gulp-uglify": "^3.0.0",
     "js-yaml": "^3.8.4",
     "jshint": "^2.9.4",
+    "lodash": "^4.17.4",
     "node-bourbon": "^4.2.8",
     "node-neat": "^2.0.0-beta.0",
     "pug": "^2.0.0-rc.2",
     "run-sequence": "^1.2.2",
+    "sass-mq": "^3.3.2",
     "yargs": "^8.0.2"
   },
   "scripts": {

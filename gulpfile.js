@@ -1,30 +1,32 @@
-var gulp = require('gulp');
-var browserSync = require('browser-sync').create();
-var reload = browserSync.reload;
-var clean = require('gulp-clean');
-var plumber = require('gulp-plumber');
-var rename = require('gulp-rename');
-var sourcemaps = require('gulp-sourcemaps');
-var sass = require('gulp-sass');
-var csslint = require('gulp-csslint');
-var autoPrefixer = require('gulp-autoprefixer');
-var runSequence = require('run-sequence');
+const gulp = require('gulp');
+const browserSync = require('browser-sync').create();
+const reload = browserSync.reload;
+const clean = require('gulp-clean');
+const plumber = require('gulp-plumber');
+const rename = require('gulp-rename');
+const sourcemaps = require('gulp-sourcemaps');
+const sass = require('gulp-sass');
+const csslint = require('gulp-csslint');
+const autoPrefixer = require('gulp-autoprefixer');
+const runSequence = require('run-sequence');
 //if node version is lower than v.0.1.2
 require('es6-promise').polyfill();
-var cssComb = require('gulp-csscomb');
-var cmq = require('gulp-merge-media-queries');
-var cleanCss = require('gulp-clean-css');
-var jshint = require('gulp-jshint');
-var browserify = require('gulp-browserify');
-var uglify = require('gulp-uglify');
-var concat = require('gulp-concat');
-var pug = require('gulp-pug');
-var minifyHtml = require('gulp-minify-html');
-var imageMin = require('gulp-imagemin');
-var cache = require('gulp-cache');
-var argv = require('yargs').argv;
-var fs = require('fs');
-var yaml = require('js-yaml');
+const cssComb = require('gulp-csscomb');
+const cmq = require('gulp-merge-media-queries');
+const cleanCss = require('gulp-clean-css');
+const jshint = require('gulp-jshint');
+const browserify = require('gulp-browserify');
+const uglify = require('gulp-uglify');
+const concat = require('gulp-concat');
+const pug = require('gulp-pug');
+const minifyHtml = require('gulp-minify-html');
+const imageMin = require('gulp-imagemin');
+const cache = require('gulp-cache');
+const argv = require('yargs').argv;
+const fs = require('fs');
+const yaml = require('js-yaml');
+const gulpif = require('gulp-if');
+const _ = require('lodash');
 
 var config = {
   environment: argv.environment || 'local',
@@ -32,7 +34,7 @@ var config = {
     src: './src',
     dist: './dist', 
     data: './src/data',
-    templates: './src/templates/pages',
+    templates: './src/templates',
     srcImages: './src/assets/images',
     srcStyles: './src/assets/styles',
     srcScripts: './src/assets/scripts',
@@ -57,7 +59,7 @@ gulp.task('clean', () => {
 });
 
 
-gulp.task('styles',()=>{
+gulp.task('styles', ()=> {
 
     gulp.src([config.paths.srcStyles  + '/main.scss'])
         .pipe(plumber({
@@ -79,10 +81,10 @@ gulp.task('styles',()=>{
         .pipe(csslint())
         // .pipe(csslint.reporter())
         .pipe(gulp.dest(config.paths.distStyles))
-        .pipe(rename({
+        .pipe(gulpif(config.minify, rename({
             suffix: '.min'
-        }))
-        .pipe(cleanCss())
+        })))
+        .pipe(gulpif(config.minify, cleanCss()))
         .pipe(sourcemaps.write())
         .pipe(gulp.dest(config.paths.distStyles))
         .pipe(reload({stream:true}))
@@ -90,7 +92,7 @@ gulp.task('styles',()=>{
 
 
 
-gulp.task('scripts',()=>{
+gulp.task('scripts',()=> {
     gulp.src([config.paths.srcScripts + '/**/*.js'])
         .pipe(plumber({
             handleError: function (err) {
@@ -113,25 +115,30 @@ gulp.task('scripts',()=>{
 
 
 
-gulp.task('templates',()=>{
+gulp.task('templates', ()=> {
 
     var data = readYamlFile('/global.yaml');
-    console.log(data);
-    gulp.src([config.paths.templates + '/**/*.pug'])
+    var nextGig;
+    if (Object.keys(data.gigs).length) {
+      data.nextGig = _.last(data.gigs);
+    }
+    var templateData = Object.assign(config, data);
+    //console.log(data);
+    gulp.src([config.paths.templates + '/pages/**/*.pug'])
         .pipe(plumber({
             handleError: function (err) {
                 console.log(err);
                 this.emit('end');
             }
         }))
-        .pipe(pug({pretty: true, data: data}))
-        .pipe(minifyHtml())
+        .pipe(pug({pretty: true, data: templateData}))
+        .pipe(gulpif(config.minify, minifyHtml()))
         .pipe(gulp.dest(config.paths.dist))
         .pipe(reload({stream:true}))
 });
 
 
-gulp.task('images',()=>{
+gulp.task('images', ()=> {
     gulp.src([config.paths.srcImages + '/**/*'])
         .pipe(plumber({
             handleError: function (err) {
@@ -146,28 +153,30 @@ gulp.task('images',()=>{
 
 
 gulp.task('watch', ()=> {
-  if (config.environment==='local') {
-    browserSync.init({
-        port: config.defaultPort,
-        server: config.paths.dist
-    });
-    gulp.watch(config.paths.srcStyles + '/**/*.js',['scripts']);
-    gulp.watch(config.paths.srcStyles + '/**/*.sass',['styles']);
-    gulp.watch(config.paths.templates + '/**/*.pug',['templates']);
-    gulp.watch(config.paths.srcImages + '/**/*',['images']);
-  };
-
+  browserSync.init({
+      port: config.defaultPort,
+      server: config.paths.dist
+  });
+  gulp.watch(config.paths.srcScripts + '/**/*.js',['scripts']);
+  gulp.watch(config.paths.srcStyles + '/**/*.scss',['styles']);
+  gulp.watch([config.paths.templates + '/**/*.pug', config.paths.data + '/**/*.yaml'],['templates']);
+  gulp.watch(config.paths.srcImages + '/**/*',['images']);
 });
 
 
-
-gulp.task('default', (cb) => {
-
+gulp.task('dev', (cb) => {
     runSequence(
-      'clean',
-      ['styles', 'scripts', 'templates', 'images'],
+      'default',
       'watch',
       cb
     );
+});
 
+
+gulp.task('default', (cb) => {
+    runSequence(
+      'clean',
+      ['styles', 'scripts', 'templates', 'images'],
+      cb
+    );
 });

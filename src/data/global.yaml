@@ -1,5 +1,22 @@
-domain: localhost:3000
-title: Hello World
-description: Hello hello
+
+title: Robot Mountain
+googlefont: https://fonts.googleapis.com/icon?family=Ubuntu+Condensed 
+meta:
+  description: Take a look through a haunted kaleidoscope. WHAT DO YOU SEE? Robot Mountain! North London's newest mixed ability alt-rock outfit. NOT including Sonny Flint on bongo. Live from a wishing well!
+  og:
+    title: Robot Mountain
+    description: Take a look through a haunted kaleidoscope. WHAT DO YOU SEE? Robot Mountain! North London's newest mixed ability alt-rock outfit. NOT including Sonny Flint on bongo. Live from a wishing well!
+    image: /assets/images/seneca.jpg
+
+
 image: /assets/images/seneca.jpg
+
+
+homepage: 
+  heading: robot mountain
+
+gigs:
+  - venue: Latitude Festival 
+    date: Saturday 15th July 2017
+    time: TBC
 
